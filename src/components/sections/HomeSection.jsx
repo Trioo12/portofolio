@@ -50,26 +50,27 @@ export default function HomeSection() {
             </div>
 
             <div className="lg:col-span-5">
-              <div className="relative mx-auto aspect-[4/5] w-full max-w-[390px] overflow-hidden rounded-[2rem] border border-slate-700/80 bg-gradient-to-br from-slate-800 via-[#0d1322] to-cyan-950/60 shadow-2xl shadow-cyan-950/30">
-                {profileImageAvailable ? (
-                  <img
-                    src="/images/profile.jpg"
-                    alt="Trio Prawiro Negoro"
-                    className="absolute inset-0 h-full w-full object-cover object-center"
-                    onError={() => setProfileImageAvailable(false)}
-                  />
-                ) : (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-8 text-center">
-                    <div className="flex h-28 w-28 items-center justify-center rounded-full border border-cyan-400/30 bg-slate-950/50 text-4xl font-semibold text-cyan-300">
-                      TP
+              <div className="mx-auto w-full max-w-[390px]">
+                <div className="relative aspect-[4/5]">
+                  {profileImageAvailable ? (
+                    <img
+                      src="/images/profile-transparent.png"
+                      alt="Trio Prawiro Negoro"
+                      className="absolute inset-0 h-full w-full object-contain object-center drop-shadow-[0_10px_22px_rgba(0,0,0,0.95)]"
+                      onError={() => setProfileImageAvailable(false)}
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-[2rem] border border-slate-700/80 bg-gradient-to-br from-slate-800 via-[#0d1322] to-cyan-950/60 p-8 text-center">
+                      <div className="flex h-28 w-28 items-center justify-center rounded-full border border-cyan-400/30 bg-slate-950/50 text-4xl font-semibold text-cyan-300">
+                        TP
+                      </div>
+                      <p className="max-w-xs text-sm text-slate-300">
+                        Tambahkan foto ke <code className="break-all text-cyan-300">public\images\profile-transparent.png</code>
+                      </p>
                     </div>
-                    <p className="max-w-xs text-sm text-slate-300">
-                      Tambahkan foto Anda ke <code className="text-cyan-300">public\images\profile.jpg</code>
-                    </p>
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#070a12] via-transparent to-slate-950/10"></div>
-                <div className="absolute inset-x-0 bottom-0 p-7 sm:p-8">
+                  )}
+                </div>
+                <div className="mt-4 rounded-2xl border border-slate-700/80 bg-gradient-to-br from-slate-800/90 via-[#0d1322] to-cyan-950/40 p-5 shadow-xl shadow-cyan-950/20">
                   <p className="mb-2 text-xs font-mono uppercase tracking-[0.2em] text-cyan-300">IoT & Embedded Systems</p>
                   <h2 className="text-2xl font-bold text-white sm:text-3xl">Trio Prawiro Negoro</h2>
                   <p className="mt-2 text-sm text-slate-300">Engineer · Hardware Developer</p>
