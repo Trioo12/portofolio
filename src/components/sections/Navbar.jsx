@@ -11,7 +11,7 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <div onClick={() => scrollToSection('home')} className="flex items-center gap-3 cursor-pointer group">
             <div className="w-10 h-10 rounded-lg bg-gradient-to-tr from-blue-600 via-cyan-500 to-teal-400 p-[1px] shadow-lg shadow-cyan-500/20">
-              <div className="w-full h-full bg-[#0d1322] rounded-[7px] flex items-center justify-center font-mono text-cyan-400 font-extrabold text-lg">TPN</div>
+              <div className="w-full h-full bg-[#0d1322] rounded-[7px]" />
             </div>
             <div>
               <span className="font-bold text-slate-100 text-lg tracking-tight group-hover:text-cyan-400 transition-colors">TRIO PRAWIRO NEGORO</span>
