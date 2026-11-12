@@ -10,9 +10,6 @@ export default function Navbar() {
       <nav className="fixed top-0 left-0 right-0 z-40 bg-[#0b0f19]/85 backdrop-blur-md border-b border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <div onClick={() => scrollToSection('home')} className="flex items-center gap-3 cursor-pointer group">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-tr from-blue-600 via-cyan-500 to-teal-400 p-[1px] shadow-lg shadow-cyan-500/20">
-              <div className="w-full h-full bg-[#0d1322] rounded-[7px]" />
-            </div>
             <div>
               <span className="font-bold text-slate-100 text-lg tracking-tight group-hover:text-cyan-400 transition-colors">TRIO PRAWIRO NEGORO</span>
               <span className="block text-xs font-mono text-slate-400">IoT & Hardware Dev</span>
