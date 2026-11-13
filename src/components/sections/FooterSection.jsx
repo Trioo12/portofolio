@@ -7,7 +7,7 @@ export default function FooterSection() {
   return (
     <>
 {/* FOOTER */}
-      <footer className="py-8 bg-[#070a12] border-t border-slate-900 text-xs text-slate-500 font-mono">
+      <footer id="footer" className="py-8 bg-[#070a12] border-t border-slate-900 text-xs text-slate-500 font-mono">
         <div className="max-w-7xl mx-auto px-4 space-y-5">
           <div className="flex flex-wrap items-center justify-center gap-3">
             <span className="text-slate-600">Data tersimpan di browser ini:</span>

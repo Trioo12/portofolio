@@ -47,7 +47,7 @@ function LabPhotoGallery({ item, imageClassName }) {
 }
 
 export default function LabSection() {
-  const { AddButton, DeleteButton, confirmDelete, filteredLab, labCategories, labFilter, selectedLabImage, setAddModal, setLabFilter, setLabItems, setSelectedLabImage } = usePortfolio();
+  const { AddButton, DeleteButton, EditButton, confirmDelete, filteredLab, labCategories, labFilter, openEditModal, selectedLabImage, setAddModal, setLabFilter, setLabItems, setSelectedLabImage } = usePortfolio();
 
   return (
     <>
@@ -88,7 +88,10 @@ export default function LabSection() {
                 <div className="p-4 bg-[#0d1322]">
                   <div className="flex items-center justify-between gap-3 mb-2">
                     <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-slate-950 border border-slate-800 text-cyan-400">{item.category}</span>
-                    <DeleteButton onClick={() => confirmDelete(item.title, () => setLabItems((p) => p.filter((x) => x.id !== item.id)))} />
+                    <div className="flex items-center gap-2">
+                      <EditButton label={`Edit ${item.title}`} onClick={() => openEditModal('lab', item)} />
+                      <DeleteButton onClick={() => confirmDelete(item.title, () => setLabItems((p) => p.filter((x) => x.id !== item.id)))} />
+                    </div>
                   </div>
                   <div className="flex items-center justify-between gap-3 mb-2">
                     <h4 className="text-sm font-bold text-slate-100 group-hover:text-cyan-300 transition-colors">{item.title}</h4>

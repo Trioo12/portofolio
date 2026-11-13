@@ -2,7 +2,8 @@ import { Mail, Github, Linkedin, Send } from 'lucide-react';
 import { usePortfolio } from '../../PortfolioContext.jsx';
 
 export default function ContactSection() {
-  const { inputCls } = usePortfolio();
+  const { EditButton, inputCls, openEditModal, siteContent } = usePortfolio();
+  const contact = siteContent.contact;
 
   return (
     <>
@@ -11,14 +12,17 @@ export default function ContactSection() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             <div className="lg:col-span-5 space-y-6">
-              <h2 className="text-xs font-mono text-cyan-400 uppercase tracking-widest">Initiate Connectivity</h2>
-              <h3 className="text-3xl font-extrabold text-slate-100">Let's Build Something Connected.</h3>
-              <p className="text-slate-300 text-sm leading-relaxed">Open to engineering opportunities, industrial IoT consulting, hardware prototyping, and custom embedded systems development.</p>
+              <div className="flex items-center justify-between gap-4">
+                <h2 className="text-xs font-mono text-cyan-400 uppercase tracking-widest">{contact.eyebrow}</h2>
+                <EditButton label="Edit Contact" onClick={() => openEditModal('contactContent', contact)} />
+              </div>
+              <h3 className="text-3xl font-extrabold text-slate-100">{contact.headline}</h3>
+              <p className="text-slate-300 text-sm leading-relaxed">{contact.description}</p>
               <div className="space-y-4 pt-4">
                 {[
-                  { href: 'mailto:prawironegorotrio@gmail.com', icon: Mail, label: 'DIRECT EMAIL', text: 'prawironegorotrio@gmail.com', color: 'bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500' },
-                  { href: 'https://linkedin.com', icon: Linkedin, label: 'LINKEDIN PROFILE', text: 'https://www.linkedin.com/in/trio-prawiro-negoro-698704224', color: 'bg-blue-500/10 text-blue-400 group-hover:bg-blue-500' },
-                  { href: 'https://github.com', icon: Github, label: 'GITHUB REPOSITORIES', text: 'github.com/trioprawiro', color: 'bg-teal-500/10 text-teal-400 group-hover:bg-teal-500' }
+                  { href: `mailto:${contact.email}`, icon: Mail, label: 'DIRECT EMAIL', text: contact.email, color: 'bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500' },
+                  { href: contact.linkedinUrl, icon: Linkedin, label: 'LINKEDIN PROFILE', text: contact.linkedinText, color: 'bg-blue-500/10 text-blue-400 group-hover:bg-blue-500' },
+                  { href: contact.githubUrl, icon: Github, label: 'GITHUB REPOSITORIES', text: contact.githubText, color: 'bg-teal-500/10 text-teal-400 group-hover:bg-teal-500' }
                 ].map(({ href, icon: Icon, label, text, color }) => (
                   <a key={label} href={href} target="_blank" rel="noreferrer"
                     className="flex items-center gap-4 p-4 rounded-xl bg-[#0b0f19] border border-slate-800 hover:border-cyan-500/40 transition-all text-slate-200 group">

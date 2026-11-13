@@ -36,7 +36,7 @@ function ProjectPhotoCarousel({ project }) {
 }
 
 export default function ProjectsSection() {
-  const { AddButton, DeleteButton, confirmDelete, filteredProjects, projectCategories, projectCategoryFilter, selectedProject, setAddModal, setProjectCategoryFilter, setProjects, setSelectedProject } = usePortfolio();
+  const { AddButton, DeleteButton, EditButton, confirmDelete, filteredProjects, openEditModal, projectCategories, projectCategoryFilter, selectedProject, setAddModal, setProjectCategoryFilter, setProjects, setSelectedProject } = usePortfolio();
 
   return (
     <>
@@ -68,7 +68,10 @@ export default function ProjectsSection() {
                   <div className="absolute top-0 right-0 z-[2] w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl group-hover:bg-cyan-500/20 transition-all pointer-events-none"></div>
                   <div className="flex justify-between items-center z-10">
                     <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-slate-900/90 border border-slate-700 text-cyan-400">{project.category}</span>
-                    <DeleteButton onClick={() => confirmDelete(project.title, () => setProjects((p) => p.filter((x) => x.id !== project.id)))} />
+                    <div className="flex items-center gap-2">
+                      <EditButton label={`Edit ${project.title}`} onClick={() => openEditModal('project', project)} />
+                      <DeleteButton onClick={() => confirmDelete(project.title, () => setProjects((p) => p.filter((x) => x.id !== project.id)))} />
+                    </div>
                   </div>
                   <div className="z-10">
                     <h4 className="text-xl font-bold text-white group-hover:text-cyan-300 transition-colors">{project.title}</h4>

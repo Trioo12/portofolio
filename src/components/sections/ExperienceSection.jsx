@@ -2,7 +2,7 @@ import { Calendar, MapPin } from 'lucide-react';
 import { usePortfolio } from '../../PortfolioContext.jsx';
 
 export default function ExperienceSection() {
-  const { AddButton, DeleteButton, confirmDelete, experience, setAddModal, setExperience } = usePortfolio();
+  const { AddButton, DeleteButton, EditButton, confirmDelete, experience, openEditModal, setAddModal, setExperience } = usePortfolio();
 
   return (
     <>
@@ -26,6 +26,7 @@ export default function ExperienceSection() {
                   <div className="flex items-center gap-3 text-xs font-mono text-slate-400">
                     <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5 text-slate-500" />{exp.period}</span>
                     {exp.location && <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5 text-slate-500" />{exp.location}</span>}
+                    <EditButton label={`Edit ${exp.title}`} onClick={() => openEditModal('experience', exp)} />
                     <DeleteButton onClick={() => confirmDelete(exp.title, () => setExperience((p) => p.filter((x) => x.id !== exp.id)))} />
                   </div>
                 </div>

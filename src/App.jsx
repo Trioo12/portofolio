@@ -10,8 +10,9 @@ import ExperienceSection from './components/sections/ExperienceSection.jsx';
 import CertificationsSection from './components/sections/CertificationsSection.jsx';
 import ContactSection from './components/sections/ContactSection.jsx';
 import FooterSection from './components/sections/FooterSection.jsx';
+import SolderCursor from './components/SolderCursor.jsx';
 import {
-  Plus, Trash2, Upload, Save, X
+  Plus, Pencil, Trash2, Upload, Save, X
 } from 'lucide-react';
 
 // ================= DEFAULT DATA (dipakai saat pertama kali dibuka) =================
@@ -217,7 +218,46 @@ const STORAGE_KEYS = {
   skills: 'tpn.skills.v1',
   lab: 'tpn.lab.v1',
   experience: 'tpn.experience.v1',
-  certs: 'tpn.certs.v1'
+  certs: 'tpn.certs.v1',
+  siteContent: 'tpn.siteContent.v1'
+};
+
+const SITE_CONTENT_DEFAULT = {
+  home: {
+    roleLabel: 'IoT Engineer & Hardware Development Engineer',
+    headlinePrefix: 'Engineering Connected Systems Through ',
+    headlineHighlight: 'IoT & Innovation.',
+    fullName: 'Trio Prawiro Negoro',
+    intro: 'I specialize in bridging physical hardware and cloud software through robust embedded systems, industrial communication protocols, custom PCB design, and edge telemetry.',
+    profileCategory: 'IoT & Embedded Systems',
+    profileSubtitle: 'Engineer · Hardware Developer'
+  },
+  about: {
+    eyebrow: 'Engineering Background & Philosophy',
+    headline: 'Bridging Physical Signals to Cloud Systems',
+    paragraphOneLead: 'I am an IoT Engineer and Hardware Developer',
+    paragraphOneTail: ' with experience in engineering end-to-end connected systems. My work spans the entire development cycle—from breadboard prototypes and PCB schematic routing to C/C++ firmware development, RS485/Modbus field integration, and cloud MQTT telemetry dashboards.',
+    paragraphTwoLead: 'Having deployed hardware in industrial manufacturing plants and maritime environments, I understand that real-world IoT is about ',
+    paragraphTwoHighlight: 'field reliability, electrical isolation, and fault-tolerant firmware',
+    paragraphTwoTail: '—not just flashing an LED on a bench.',
+    primaryMcus: 'ESP32, STM32, PLC',
+    protocols: 'Modbus, CAN Bus, MQTT',
+    features: [
+      { title: '1. Robust Hardware Design', description: 'Designing custom multi-layer PCBs with galvanic power isolation, MOV transient suppression, optocouplers, and IPC-standard trace separation for noisy electromagnetic environments.' },
+      { title: '2. Non-Blocking Firmware', description: 'Writing efficient C/C++ firmware utilizing FreeRTOS task queues, state machines, and hardware interrupt handlers to prevent network lockups and data loss.' },
+      { title: '3. System Integration & Edge Analytics', description: 'Deploying Node-RED flows, Docker edge containers, and real-time supervisory dashboards (Grafana) to aggregate telemetry across disparate industrial machinery brands.' }
+    ]
+  },
+  contact: {
+    eyebrow: 'Initiate Connectivity',
+    headline: "Let's Build Something Connected.",
+    description: 'Open to engineering opportunities, industrial IoT consulting, hardware prototyping, and custom embedded systems development.',
+    email: 'prawironegorotrio@gmail.com',
+    linkedinUrl: 'https://linkedin.com',
+    linkedinText: 'https://www.linkedin.com/in/trio-prawiro-negoro-698704224',
+    githubUrl: 'https://github.com',
+    githubText: 'github.com/trioprawiro'
+  }
 };
 
 // ================= HELPERS =================
@@ -292,6 +332,20 @@ function AddButton({ onClick, children }) {
   );
 }
 
+function EditButton({ onClick, className = '', label = 'Edit' }) {
+  return (
+    <button
+      type="button"
+      onClick={(e) => { e.stopPropagation(); onClick(); }}
+      title={label}
+      aria-label={label}
+      className={`p-1.5 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-500 hover:text-cyan-400 hover:border-cyan-500/50 transition-all ${className}`}
+    >
+      <Pencil className="w-3.5 h-3.5" />
+    </button>
+  );
+}
+
 function DeleteButton({ onClick, className = '' }) {
   return (
     <button
@@ -305,10 +359,10 @@ function DeleteButton({ onClick, className = '' }) {
 }
 
 // Modal form generik. fields: {name,label,type,options,required,placeholder,hint,showIf,datalist}
-function FormModal({ title, fields, onSubmit, onClose }) {
+function FormModal({ title, fields, initialValues, onSubmit, onClose }) {
   const [values, setValues] = useState(() => {
-    const v = {};
-    fields.forEach((f) => { v[f.name] = f.default ?? (f.multiple ? [] : ''); });
+    const v = { ...initialValues };
+    fields.forEach((f) => { v[f.name] = initialValues?.[f.name] ?? f.default ?? (f.multiple ? [] : ''); });
     return v;
   });
   const [busy, setBusy] = useState(false);
@@ -360,7 +414,7 @@ function FormModal({ title, fields, onSubmit, onClose }) {
       >
         <div className="p-5 border-b border-slate-800 flex items-center justify-between">
           <h3 className="text-lg font-bold text-white flex items-center gap-2">
-            <Plus className="w-5 h-5 text-cyan-400" /> {title}
+            {initialValues ? <Pencil className="w-5 h-5 text-cyan-400" /> : <Plus className="w-5 h-5 text-cyan-400" />} {title}
           </h3>
           <button type="button" onClick={onClose} className="p-2 rounded-lg bg-slate-900 text-slate-400 hover:text-white">
             <X className="w-5 h-5" />
@@ -477,6 +531,7 @@ export default function App() {
   const [selectedCert, setSelectedCert] = useState(null);
   const [skillSearch, setSkillSearch] = useState('');
   const [addModal, setAddModal] = useState(null); // 'skill' | 'project' | 'lab' | 'experience' | 'cert'
+  const [editTarget, setEditTarget] = useState(null);
 
   // Data (tersimpan di localStorage)
   const [projects, setProjects] = usePersisted(STORAGE_KEYS.projects, PROJECTS_DEFAULT);
@@ -484,11 +539,25 @@ export default function App() {
   const [labItems, setLabItems] = usePersisted(STORAGE_KEYS.lab, LAB_DEFAULT);
   const [experience, setExperience] = usePersisted(STORAGE_KEYS.experience, EXPERIENCE_DEFAULT);
   const [certs, setCerts] = usePersisted(STORAGE_KEYS.certs, CERTS_DEFAULT);
+  const [siteContent, setSiteContent] = usePersisted(STORAGE_KEYS.siteContent, SITE_CONTENT_DEFAULT);
 
   const canvasRef = useRef(null);
 
+  const openAddModal = (type) => {
+    setEditTarget(null);
+    setAddModal(type);
+  };
+  const openEditModal = (type, item) => {
+    setEditTarget({ type, item });
+    setAddModal(type);
+  };
+  const closeFormModal = () => {
+    setAddModal(null);
+    setEditTarget(null);
+  };
+
   useEffect(() => {
-    const sections = document.querySelectorAll('section[id]');
+    const sections = document.querySelectorAll('section[id], footer[id]');
     if (!('IntersectionObserver' in window)) {
       sections.forEach((section) => section.classList.add('is-visible'));
       return;
@@ -587,7 +656,7 @@ export default function App() {
     const category = v.category === '__new__' ? v.newCategory.trim() : v.category;
     if (!category) return alert('Nama kategori wajib diisi.');
     setSkills((prev) => [...prev, { id: uid('sk'), category, name: v.name.trim(), level: v.level, desc: v.desc.trim() }]);
-    setAddModal(null);
+    closeFormModal();
   };
   const addProject = (v) => {
     setProjects((prev) => [...prev, {
@@ -597,18 +666,18 @@ export default function App() {
       implementation: v.implementation.trim(), testingResults: v.testingResults.trim(), responsibilities: splitLines(v.responsibilities),
       images: v.images
     }]);
-    setAddModal(null);
+    closeFormModal();
   };
   const addLab = (v) => {
     setLabItems((prev) => [...prev, { id: uid('lab'), title: v.title.trim(), category: v.category.trim(), description: v.description.trim(), images: v.images }]);
-    setAddModal(null);
+    closeFormModal();
   };
   const addExperience = (v) => {
     setExperience((prev) => [{
       id: uid('exp'), title: v.title.trim(), company: v.company.trim(), period: v.period.trim(), type: v.type,
       location: v.location.trim(), responsibilities: splitLines(v.responsibilities), tech: splitComma(v.tech)
     }, ...prev]);
-    setAddModal(null);
+    closeFormModal();
   };
   const addCert = (v) => {
     setCerts((prev) => [...prev, {
@@ -617,7 +686,52 @@ export default function App() {
       certificateFile: v.certificateFile, certificateFileType: v.certificateFileType,
       certificateFileName: v.certificateFileName
     }]);
-    setAddModal(null);
+    closeFormModal();
+  };
+
+  const updateSkill = (item, v) => {
+    const category = v.category === '__new__' ? v.newCategory.trim() : v.category;
+    if (!category) return alert('Nama kategori wajib diisi.');
+    setSkills((prev) => prev.map((skill) => skill.id === item.id
+      ? { ...skill, category, name: v.name.trim(), level: v.level, desc: v.desc.trim() }
+      : skill));
+    closeFormModal();
+  };
+  const updateProject = (item, v) => {
+    setProjects((prev) => prev.map((project) => project.id === item.id ? {
+      ...project, title: v.title.trim(), subtitle: v.subtitle.trim(), category: v.category.trim(),
+      tags: splitComma(v.tags), overview: v.overview.trim(), problem: v.problem.trim(), objective: v.objective.trim(),
+      architecture: v.architecture.trim(), hardwareBOM: splitLines(v.hardwareBOM), softwareStack: splitComma(v.softwareStack),
+      implementation: v.implementation.trim(), testingResults: v.testingResults.trim(),
+      responsibilities: splitLines(v.responsibilities), images: v.images
+    } : project));
+    closeFormModal();
+  };
+  const updateLab = (item, v) => {
+    setLabItems((prev) => prev.map((lab) => lab.id === item.id
+      ? { ...lab, title: v.title.trim(), category: v.category.trim(), description: v.description.trim(), images: v.images }
+      : lab));
+    closeFormModal();
+  };
+  const updateExperience = (item, v) => {
+    setExperience((prev) => prev.map((exp) => exp.id === item.id ? {
+      ...exp, title: v.title.trim(), company: v.company.trim(), period: v.period.trim(), type: v.type,
+      location: v.location.trim(), responsibilities: splitLines(v.responsibilities), tech: splitComma(v.tech)
+    } : exp));
+    closeFormModal();
+  };
+  const updateCert = (item, v) => {
+    setCerts((prev) => prev.map((cert) => cert.id === item.id ? {
+      ...cert, title: v.title.trim(), issuer: v.issuer.trim(), date: v.date.trim(),
+      credentialId: v.credentialId.trim(), description: v.description.trim(), badgeColor: v.badgeColor,
+      certificateFile: v.certificateFile, certificateFileType: v.certificateFileType,
+      certificateFileName: v.certificateFileName
+    } : cert));
+    closeFormModal();
+  };
+  const updateSiteContent = (section, values) => {
+    setSiteContent((prev) => ({ ...prev, [section]: { ...prev[section], ...values } }));
+    closeFormModal();
   };
 
   // ---------- form definitions ----------
@@ -625,6 +739,8 @@ export default function App() {
     skill: {
       title: 'Add Skill',
       onSubmit: addSkill,
+      onUpdate: updateSkill,
+      toFormValues: (item) => ({ ...item, newCategory: '' }),
       fields: [
         { name: 'category', label: 'Kategori', type: 'select', required: true, default: skillCategories[0] || '__new__',
           options: [...skillCategories.map((c) => ({ value: c, label: c })), { value: '__new__', label: '+ Kategori baru...' }] },
@@ -638,6 +754,12 @@ export default function App() {
     project: {
       title: 'Add Project',
       onSubmit: addProject,
+      onUpdate: updateProject,
+      toFormValues: (item) => ({
+        ...item, tags: (item.tags || []).join(', '), hardwareBOM: (item.hardwareBOM || []).join('\n'),
+        softwareStack: (item.softwareStack || []).join(', '), responsibilities: (item.responsibilities || []).join('\n'),
+        images: Array.isArray(item.images) ? item.images : item.image ? [item.image] : []
+      }),
       fields: [
         { name: 'title', label: 'Judul project', type: 'text', required: true },
         { name: 'subtitle', label: 'Subjudul', type: 'text', placeholder: 'mis. ESP32 to Hikvision ACS Bridge' },
@@ -658,6 +780,10 @@ export default function App() {
     lab: {
       title: 'Add Lab Artifact',
       onSubmit: addLab,
+      onUpdate: updateLab,
+      toFormValues: (item) => ({
+        ...item, images: Array.isArray(item.images) ? item.images : item.image ? [item.image] : []
+      }),
       fields: [
         { name: 'title', label: 'Judul', type: 'text', required: true },
         { name: 'category', label: 'Kategori', type: 'text', required: true, datalist: labCategories.filter((c) => c !== 'All'), hint: 'Pilih yang ada atau ketik baru.' },
@@ -668,6 +794,10 @@ export default function App() {
     experience: {
       title: 'Add Experience',
       onSubmit: addExperience,
+      onUpdate: updateExperience,
+      toFormValues: (item) => ({
+        ...item, responsibilities: (item.responsibilities || []).join('\n'), tech: (item.tech || []).join(', ')
+      }),
       fields: [
         { name: 'title', label: 'Posisi', type: 'text', required: true },
         { name: 'company', label: 'Perusahaan', type: 'text', required: true },
@@ -682,6 +812,8 @@ export default function App() {
     cert: {
       title: 'Add Certification',
       onSubmit: addCert,
+      onUpdate: updateCert,
+      toFormValues: (item) => ({ ...item, certificateFile: item.certificateFile || '' }),
       fields: [
         { name: 'title', label: 'Nama sertifikasi', type: 'text', required: true },
         { name: 'issuer', label: 'Penerbit', type: 'text', required: true },
@@ -692,12 +824,78 @@ export default function App() {
         { name: 'badgeColor', label: 'Warna badge', type: 'select', default: Object.values(BADGE_COLORS)[0],
           options: Object.entries(BADGE_COLORS).map(([label, value]) => ({ value, label })) }
       ]
+    },
+    homeContent: {
+      title: 'Edit Home Content',
+      onUpdate: (_, values) => updateSiteContent('home', values),
+      toFormValues: (content) => content,
+      fields: [
+        { name: 'roleLabel', label: 'Label profesi', type: 'text', required: true },
+        { name: 'headlinePrefix', label: 'Judul utama', type: 'text', required: true },
+        { name: 'headlineHighlight', label: 'Teks highlight', type: 'text', required: true },
+        { name: 'fullName', label: 'Nama', type: 'text', required: true },
+        { name: 'intro', label: 'Deskripsi singkat', type: 'textarea', required: true, rows: 4 },
+        { name: 'profileCategory', label: 'Kategori profil', type: 'text', required: true },
+        { name: 'profileSubtitle', label: 'Subjudul profil', type: 'text', required: true }
+      ]
+    },
+    aboutContent: {
+      title: 'Edit About Content',
+      onUpdate: (_, values) => updateSiteContent('about', {
+        eyebrow: values.eyebrow, headline: values.headline, paragraphOneLead: values.paragraphOneLead,
+        paragraphOneTail: values.paragraphOneTail, paragraphTwoLead: values.paragraphTwoLead,
+        paragraphTwoHighlight: values.paragraphTwoHighlight, paragraphTwoTail: values.paragraphTwoTail,
+        primaryMcus: values.primaryMcus, protocols: values.protocols,
+        features: [1, 2, 3].map((number) => ({
+          title: values[`feature${number}Title`], description: values[`feature${number}Description`]
+        }))
+      }),
+      toFormValues: (content) => ({
+        eyebrow: content.eyebrow, headline: content.headline, paragraphOneLead: content.paragraphOneLead,
+        paragraphOneTail: content.paragraphOneTail, paragraphTwoLead: content.paragraphTwoLead,
+        paragraphTwoHighlight: content.paragraphTwoHighlight, paragraphTwoTail: content.paragraphTwoTail,
+        primaryMcus: content.primaryMcus, protocols: content.protocols,
+        ...content.features.reduce((values, feature, index) => ({
+          ...values, [`feature${index + 1}Title`]: feature.title,
+          [`feature${index + 1}Description`]: feature.description
+        }), {})
+      }),
+      fields: [
+        { name: 'eyebrow', label: 'Label section', type: 'text', required: true },
+        { name: 'headline', label: 'Judul', type: 'text', required: true },
+        { name: 'paragraphOneLead', label: 'Paragraf pertama (teks tebal)', type: 'text', required: true },
+        { name: 'paragraphOneTail', label: 'Paragraf pertama (lanjutan)', type: 'textarea', required: true, rows: 3 },
+        { name: 'paragraphTwoLead', label: 'Paragraf kedua (awal)', type: 'textarea', required: true, rows: 2 },
+        { name: 'paragraphTwoHighlight', label: 'Paragraf kedua (teks highlight)', type: 'text', required: true },
+        { name: 'paragraphTwoTail', label: 'Paragraf kedua (akhir)', type: 'text', required: true },
+        { name: 'primaryMcus', label: 'Primary MCUs', type: 'text', required: true },
+        { name: 'protocols', label: 'Protocols', type: 'text', required: true },
+        ...[1, 2, 3].flatMap((number) => [
+          { name: `feature${number}Title`, label: `Judul poin ${number}`, type: 'text', required: true },
+          { name: `feature${number}Description`, label: `Deskripsi poin ${number}`, type: 'textarea', required: true, rows: 3 }
+        ])
+      ]
+    },
+    contactContent: {
+      title: 'Edit Contact Content',
+      onUpdate: (_, values) => updateSiteContent('contact', values),
+      toFormValues: (content) => content,
+      fields: [
+        { name: 'eyebrow', label: 'Label section', type: 'text', required: true },
+        { name: 'headline', label: 'Judul', type: 'text', required: true },
+        { name: 'description', label: 'Deskripsi', type: 'textarea', required: true, rows: 3 },
+        { name: 'email', label: 'Email', type: 'text', required: true },
+        { name: 'linkedinUrl', label: 'URL LinkedIn', type: 'text', required: true },
+        { name: 'linkedinText', label: 'Teks LinkedIn', type: 'text', required: true },
+        { name: 'githubUrl', label: 'URL GitHub', type: 'text', required: true },
+        { name: 'githubText', label: 'Teks GitHub', type: 'text', required: true }
+      ]
     }
   };
 
   // ---------- backup / restore ----------
   const exportData = () => {
-    const blob = new Blob([JSON.stringify({ projects, skills, labItems, experience, certs }, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ projects, skills, labItems, experience, certs, siteContent }, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `portfolio-backup-${new Date().toISOString().slice(0, 10)}.json`;
@@ -715,6 +913,7 @@ export default function App() {
         if (d.labItems) setLabItems(d.labItems);
         if (d.experience) setExperience(d.experience);
         if (d.certs) setCerts(d.certs);
+        if (d.siteContent) setSiteContent(d.siteContent);
         alert('Data berhasil diimpor.');
       } catch {
         alert('File backup tidak valid.');
@@ -729,6 +928,7 @@ export default function App() {
     setLabItems(LAB_DEFAULT);
     setExperience(EXPERIENCE_DEFAULT);
     setCerts(CERTS_DEFAULT);
+    setSiteContent(SITE_CONTENT_DEFAULT);
   };
 
   const navLinks = [
@@ -738,13 +938,22 @@ export default function App() {
   ];
 
   const activeForm = addModal ? formDefs[addModal] : null;
+  const isEditing = Boolean(activeForm && editTarget?.type === addModal);
+  const formInitialValues = isEditing ? activeForm.toFormValues(editTarget.item) : undefined;
+  const handleFormSubmit = isEditing
+    ? (values) => activeForm.onUpdate(editTarget.item, values)
+    : activeForm?.onSubmit;
+  const formTitle = isEditing && activeForm.title.startsWith('Add ')
+    ? activeForm.title.replace('Add ', 'Edit ')
+    : activeForm?.title;
 
-  const portfolio = { AddButton, DeleteButton, activeSection, canvasRef, certs, confirmDelete, cvModalOpen, experience, exportData, filteredLab, filteredProjects, importData, inputCls, labCategories, labFilter, mobileMenuOpen, navLinks, projectCategories, projectCategoryFilter, projects, resetData, scrollToSection, selectedCert, selectedLabImage, selectedProject, setAddModal, setCerts, setCvModalOpen, setExperience, setLabFilter, setLabItems, setMobileMenuOpen, setProjectCategoryFilter, setProjects, setSelectedCert, setSelectedLabImage, setSelectedProject, setSkillSearch, setSkills, skillCategories, skillSearch, skills };
+  const portfolio = { AddButton, DeleteButton, EditButton, activeSection, canvasRef, certs, confirmDelete, cvModalOpen, experience, exportData, filteredLab, filteredProjects, importData, inputCls, labCategories, labFilter, mobileMenuOpen, navLinks, openEditModal, projectCategories, projectCategoryFilter, projects, resetData, scrollToSection, selectedCert, selectedLabImage, selectedProject, setAddModal: openAddModal, setCerts, setCvModalOpen, setExperience, setLabFilter, setLabItems, setMobileMenuOpen, setProjectCategoryFilter, setProjects, setSelectedCert, setSelectedLabImage, setSelectedProject, setSiteContent, setSkillSearch, setSkills, siteContent, skillCategories, skillSearch, skills };
 
   return (
     <PortfolioContext.Provider value={portfolio}>
       <div className="bg-[#0b0f19] text-slate-100 min-h-screen font-sans selection:bg-cyan-500 selection:text-slate-900 relative">
         <Navbar />
+        <SolderCursor />
         <HomeSection />
         <AboutSection />
         <SkillsSection />
@@ -755,7 +964,14 @@ export default function App() {
         <ContactSection />
         <FooterSection />
         {activeForm && (
-          <FormModal key={addModal} title={activeForm.title} fields={activeForm.fields} onSubmit={activeForm.onSubmit} onClose={() => setAddModal(null)} />
+          <FormModal
+            key={`${addModal}-${isEditing ? (editTarget.item.id || editTarget.type) : 'add'}`}
+            title={formTitle}
+            fields={activeForm.fields}
+            initialValues={formInitialValues}
+            onSubmit={handleFormSubmit}
+            onClose={closeFormModal}
+          />
         )}
       </div>
     </PortfolioContext.Provider>

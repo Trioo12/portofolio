@@ -2,7 +2,7 @@ import { Zap, Search } from 'lucide-react';
 import { usePortfolio } from '../../PortfolioContext.jsx';
 
 export default function SkillsSection() {
-  const { AddButton, DeleteButton, confirmDelete, setAddModal, setSkillSearch, setSkills, skillCategories, skillSearch, skills } = usePortfolio();
+  const { AddButton, DeleteButton, EditButton, confirmDelete, openEditModal, setAddModal, setSkillSearch, setSkills, skillCategories, skillSearch, skills } = usePortfolio();
 
   return (
     <>
@@ -43,6 +43,7 @@ export default function SkillsSection() {
                             <span className="text-slate-200 group-hover/skill:text-cyan-400 transition-colors">{skill.name}</span>
                             <div className="flex items-center gap-2 shrink-0">
                               <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-400">{skill.level}</span>
+                              <EditButton label={`Edit ${skill.name}`} onClick={() => openEditModal('skill', skill)} className="opacity-0 group-hover/skill:opacity-100" />
                               <DeleteButton onClick={() => confirmDelete(skill.name, () => setSkills((p) => p.filter((x) => x.id !== skill.id)))}
                                 className="opacity-0 group-hover/skill:opacity-100" />
                             </div>

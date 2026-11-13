@@ -4,7 +4,7 @@ import { usePortfolio } from '../../PortfolioContext.jsx';
 
 export default function HomeSection() {
   const [profileImageAvailable, setProfileImageAvailable] = useState(true);
-  const { canvasRef, certs, projects, scrollToSection, skills } = usePortfolio();
+  const { canvasRef, certs, EditButton, openEditModal, projects, scrollToSection, siteContent, skills } = usePortfolio();
 
   return (
     <>
@@ -17,15 +17,18 @@ export default function HomeSection() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-950/60 border border-blue-500/30 text-xs font-mono text-cyan-300 backdrop-blur-sm">
-                <Cpu className="w-4 h-4 text-cyan-400 animate-pulse" />
-                <span>IoT Engineer & Hardware Development Engineer</span>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-950/60 border border-blue-500/30 text-xs font-mono text-cyan-300 backdrop-blur-sm">
+                  <Cpu className="w-4 h-4 text-cyan-400 animate-pulse" />
+                  <span>{siteContent.home.roleLabel}</span>
+                </div>
+                <EditButton label="Edit Home" onClick={() => openEditModal('homeContent', siteContent.home)} />
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.15]">
-                Engineering Connected Systems Through <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-300 bg-clip-text text-transparent">IoT & Innovation.</span>
+                {siteContent.home.headlinePrefix}<span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-300 bg-clip-text text-transparent">{siteContent.home.headlineHighlight}</span>
               </h1>
               <p className="text-slate-300 text-lg md:text-xl font-normal leading-relaxed max-w-2xl">
-                Hi, I'm <strong className="text-white font-semibold">Trio Prawiro Negoro</strong>. I specialize in bridging physical hardware and cloud software through robust embedded systems, industrial communication protocols, custom PCB design, and edge telemetry.
+                Hi, I'm <strong className="text-white font-semibold">{siteContent.home.fullName}</strong>. {siteContent.home.intro}
               </p>
               <div className="flex flex-wrap items-center gap-4 pt-2">
                 <button onClick={() => scrollToSection('projects')}
@@ -55,8 +58,8 @@ export default function HomeSection() {
                   {profileImageAvailable ? (
                     <img
                       src="/images/profile-transparent.png"
-                      alt="Trio Prawiro Negoro"
-                      className="absolute inset-0 h-full w-full object-contain object-center drop-shadow-[0_10px_22px_rgba(0,0,0,0.95)]"
+                      alt={siteContent.home.fullName}
+                      className="profile-image-blend absolute inset-0 h-full w-full object-contain object-center drop-shadow-[0_16px_30px_rgba(0,0,0,0.55)]"
                       onError={() => setProfileImageAvailable(false)}
                     />
                   ) : (
@@ -71,9 +74,9 @@ export default function HomeSection() {
                   )}
                 </div>
                 <div className="mt-4 rounded-2xl border border-slate-700/80 bg-gradient-to-br from-slate-800/90 via-[#0d1322] to-cyan-950/40 p-5 shadow-xl shadow-cyan-950/20">
-                  <p className="mb-2 text-xs font-mono uppercase tracking-[0.2em] text-cyan-300">IoT & Embedded Systems</p>
-                  <h2 className="text-2xl font-bold text-white sm:text-3xl">Trio Prawiro Negoro</h2>
-                  <p className="mt-2 text-sm text-slate-300">Engineer · Hardware Developer</p>
+                  <p className="mb-2 text-xs font-mono uppercase tracking-[0.2em] text-cyan-300">{siteContent.home.profileCategory}</p>
+                  <h2 className="text-2xl font-bold text-white sm:text-3xl">{siteContent.home.fullName}</h2>
+                  <p className="mt-2 text-sm text-slate-300">{siteContent.home.profileSubtitle}</p>
                 </div>
               </div>
             </div>

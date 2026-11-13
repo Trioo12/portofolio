@@ -2,7 +2,7 @@ import { FileText, Download, X, ShieldCheck, Award } from 'lucide-react';
 import { usePortfolio } from '../../PortfolioContext.jsx';
 
 export default function CertificationsSection() {
-  const { AddButton, DeleteButton, certs, confirmDelete, cvModalOpen, selectedCert, setAddModal, setCerts, setCvModalOpen, setSelectedCert } = usePortfolio();
+  const { AddButton, DeleteButton, EditButton, certs, confirmDelete, cvModalOpen, openEditModal, selectedCert, setAddModal, setCerts, setCvModalOpen, setSelectedCert } = usePortfolio();
 
   return (
     <>
@@ -22,7 +22,10 @@ export default function CertificationsSection() {
                     <div className={`w-12 h-12 rounded-xl bg-gradient-to-tr ${cert.badgeColor} p-0.5 shadow-lg`}>
                       <div className="w-full h-full bg-[#0d1322] rounded-[10px] flex items-center justify-center"><Award className="w-6 h-6 text-white" /></div>
                     </div>
-                    <DeleteButton onClick={() => confirmDelete(cert.title, () => setCerts((p) => p.filter((x) => x.id !== cert.id)))} />
+                    <div className="flex items-center gap-2">
+                      <EditButton label={`Edit ${cert.title}`} onClick={() => openEditModal('cert', cert)} />
+                      <DeleteButton onClick={() => confirmDelete(cert.title, () => setCerts((p) => p.filter((x) => x.id !== cert.id)))} />
+                    </div>
                   </div>
                   <h4 className="text-lg font-bold text-white group-hover:text-cyan-300 transition-colors">{cert.title}</h4>
                   <span className="text-xs font-mono text-slate-400 block mt-1">{cert.issuer}{cert.date && ` · ${cert.date}`}</span>

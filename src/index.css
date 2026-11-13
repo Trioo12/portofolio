@@ -9,17 +9,157 @@ html {
 body {
   margin: 0;
   background: #0b0f19;
+  cursor: url('/cursors/soldering-iron.svg') 26 7, auto;
 }
 
-section[id].scroll-reveal {
+a,
+button,
+select,
+label,
+[role='button'],
+.cursor-pointer {
+  cursor: url('/cursors/soldering-iron.svg') 26 7, pointer;
+}
+
+input,
+textarea,
+[contenteditable='true'] {
+  cursor: text;
+}
+
+@media (pointer: fine) {
+  body,
+  body * {
+    cursor: none !important;
+  }
+
+  input,
+  textarea,
+  [contenteditable='true'] {
+    cursor: text !important;
+  }
+}
+
+.solder-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  width: 36px;
+  height: 36px;
   opacity: 0;
-  transform: translateY(14px);
-  transition: opacity 650ms ease, transform 650ms ease;
+  pointer-events: none;
+  will-change: transform;
 }
 
-section[id].scroll-reveal.is-visible {
+.solder-cursor.is-visible {
+  opacity: 1;
+}
+
+.solder-cursor.is-hidden {
+  opacity: 0;
+}
+
+.solder-cursor > img {
+  display: block;
+  width: 36px;
+  height: 36px;
+}
+
+.solder-cursor-smoke {
+  position: absolute;
+  top: -19px;
+  left: 7px;
+  width: 32px;
+  height: 32px;
+  overflow: visible;
+  filter: drop-shadow(0 0 2px rgb(203 213 225 / 25%));
+}
+
+.smoke-wisp {
+  stroke: #cbd5e1;
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: solder-smoke-rise 1.7s ease-out infinite;
+}
+
+.smoke-wisp-two {
+  animation-delay: 650ms;
+}
+
+@keyframes solder-smoke-rise {
+  0% {
+    opacity: 0;
+    stroke-dashoffset: 1;
+    transform: translateY(3px) scale(0.75);
+  }
+
+  18% {
+    opacity: 0.7;
+  }
+
+  100% {
+    opacity: 0;
+    stroke-dashoffset: 0;
+    transform: translateY(-8px) scale(1.15);
+  }
+}
+
+.profile-image-blend {
+  -webkit-mask-image: radial-gradient(ellipse 88% 76% at 50% 36%, #000 68%, transparent 100%);
+  mask-image: radial-gradient(ellipse 88% 76% at 50% 36%, #000 68%, transparent 100%);
+}
+
+[id].scroll-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 700ms ease, transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+[id].scroll-reveal.is-visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+[id].scroll-reveal.is-visible :is(.max-w-7xl, .grid, .space-y-4, .space-y-6) > * {
+  animation: content-enter 600ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+[id].scroll-reveal.is-visible :is(.max-w-7xl, .grid, .space-y-4, .space-y-6) > :nth-child(2) {
+  animation-delay: 80ms;
+}
+
+[id].scroll-reveal.is-visible :is(.max-w-7xl, .grid, .space-y-4, .space-y-6) > :nth-child(3) {
+  animation-delay: 160ms;
+}
+
+[id].scroll-reveal.is-visible :is(.max-w-7xl, .grid, .space-y-4, .space-y-6) > :nth-child(4) {
+  animation-delay: 240ms;
+}
+
+[id].scroll-reveal.is-visible :is(.max-w-7xl, .grid, .space-y-4, .space-y-6) > :nth-child(5) {
+  animation-delay: 320ms;
+}
+
+[id].scroll-reveal.is-visible :is(.max-w-7xl, .grid, .space-y-4, .space-y-6) > :nth-child(6) {
+  animation-delay: 400ms;
+}
+
+@keyframes content-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -27,10 +167,20 @@ section[id].scroll-reveal.is-visible {
     scroll-behavior: auto;
   }
 
-  section[id].scroll-reveal,
-  section[id].scroll-reveal.is-visible {
+  [id].scroll-reveal,
+  [id].scroll-reveal.is-visible {
     opacity: 1;
     transform: none;
     transition: none;
+  }
+
+  [id].scroll-reveal.is-visible :is(.max-w-7xl, .grid, .space-y-4, .space-y-6) > * {
+    animation: none;
+  }
+
+  .smoke-wisp {
+    animation: none;
+    stroke-dashoffset: 0;
+    opacity: 0.45;
   }
 }
